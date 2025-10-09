@@ -4,25 +4,28 @@ import { useState, FormEvent, Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import * as THREE from 'three';
+import type { GLTF } from 'three-stdlib';
 
 function TShirtModel({ model }: { model: string }) {
-  const gltf: any = useGLTF(model);
-  
+  const gltf = useGLTF(model) as unknown as GLTF;
+
   // Add colored highlight depending on T-shirt
   useEffect(() => {
-    gltf.scene.traverse((child: any) => {
-      if (child.isMesh) {
+    gltf.scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        const material = child.material as THREE.MeshStandardMaterial | undefined;
+        if (!material) return;
+
         // Basic logic: if model filename includes '1' → dark T-shirt, else light
-        if (model.includes("tshirt1")) {
-          child.material.emissive = child.material.emissive || {};
-          child.material.emissiveIntensity = 0.15; // subtle glow
-          child.material.emissive.set(0xffffff); // white shadow/highlight for dark T-shirt
+        if (model.includes('tshirt1')) {
+          material.emissive = material.emissive || new THREE.Color(0xffffff);
+          material.emissiveIntensity = 0.15; // subtle glow
+          material.emissive.set(0xffffff);
         } else {
-          child.material.emissive = child.material.emissive || {};
-          child.material.emissiveIntensity = 0.15;
-          child.material.emissive.set(0x000000); // black shadow/highlight for light T-shirt
+          material.emissive = material.emissive || new THREE.Color(0x000000);
+          material.emissiveIntensity = 0.15;
+          material.emissive.set(0x000000);
         }
       }
     });
@@ -47,8 +50,43 @@ export default function CustomizeTShirtPage() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({ email, phone, design, reference, tshirt: models[currentModel] });
-    alert("Your T-shirt request has been submitted!");
+    (async () => {
+      try {
+        // Convert file to base64 if provided
+        let referenceBase64: string | null = null;
+        if (reference) {
+          referenceBase64 = await new Promise<string | null>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(reference);
+          });
+        }
+
+        const payload = {
+          title: `Customization request - ${email || phone || 'guest'}`,
+          details: design,
+          referenceImages: referenceBase64 ? [referenceBase64] : [],
+        };
+
+        const res = await fetch('/api/requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) throw new Error('Failed to submit request');
+
+        setDesign('');
+        setEmail('');
+        setPhone('');
+        setReference(null);
+        alert('Your customization request was submitted successfully. We will contact you soon.');
+      } catch (err) {
+        console.error(err);
+        alert('There was an error submitting your request. Please try again later.');
+      }
+    })();
   };
 
   return (

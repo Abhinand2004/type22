@@ -4,7 +4,7 @@ export type DesignRequestStatus = "pending" | "approved" | "rejected" | "in_chat
 
 export interface IDesignRequest {
   _id: string;
-  userId: Types.ObjectId;
+  userId?: Types.ObjectId;
   title: string;
   details?: string;
   referenceImages: string[];
@@ -15,7 +15,7 @@ export interface IDesignRequest {
 
 const DesignRequestSchema = new Schema<IDesignRequest>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  userId: { type: Schema.Types.ObjectId, ref: "User" },
     title: { type: String, required: true },
     details: { type: String },
     referenceImages: { type: [String], default: [] },

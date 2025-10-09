@@ -31,7 +31,7 @@ export default function Hero() {
       <img
         src="/images/home.png"
         alt="Premium apparel"
-        className="w-full h-100 rounded-2xl"
+        className="w-120 h-100 rounded-2xl"
       />
     </section>
   );

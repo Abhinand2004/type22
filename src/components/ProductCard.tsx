@@ -1,78 +1,67 @@
 "use client";
 
-import Image from "next/image";
-import { useRef } from "react";
+import Link from "next/link";
+import React from "react";
+import { CornerUpRight } from "lucide-react";
 
 type ProductCardProps = {
   title: string;
-  imageUrl: string;
-  price: number;
+  imageUrl?: string;
+  price?: number;
+  id?: string; // optional DB id; if provided, Buy Now links to /products/{id}
+  sizes?: string[]; // 👈 new prop for size chart
 };
 
-export function ProductCard({ title, imageUrl, price }: ProductCardProps) {
-  const cardRef = useRef<HTMLDivElement | null>(null);
-
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const el = cardRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const midX = rect.width / 2;
-    const midY = rect.height / 2;
-    const rotateY = ((x - midX) / midX) * 6;
-    const rotateX = -((y - midY) / midY) * 6;
-    el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-  }
-
-  function resetTilt() {
-    const el = cardRef.current;
-    if (!el) return;
-    el.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
-  }
+export function ProductCard({
+  title,
+  imageUrl = "/hero.svg",
+  price = 0,
+  id,
+  sizes = ["S", "M", "L", "XL"],
+}: ProductCardProps) {
+  const buyHref = id
+    ? `/products/${encodeURIComponent(id)}`
+    : `/products/${encodeURIComponent(title)}`;
 
   return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={resetTilt}
-      className="group relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950 shadow-md hover:shadow-xl transition-all duration-300"
-    >
+    <div className="w-full max-w-xs rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow hover:shadow-amber-300/20 transition-all duration-300">
       {/* Image */}
-      <div className="aspect-[4/5] relative overflow-hidden">
-        <Image
+      <div className="relative h-48 w-full overflow-hidden">
+        <img
           src={imageUrl}
           alt={title}
-          fill
-          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-500"
         />
-        {/* Subtle overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
 
-      {/* Info */}
-      <div className="p-4 flex items-center justify-between">
-        <div>
-          <h3 className="font-semibold text-zinc-800 dark:text-zinc-100 text-base sm:text-lg tracking-tight">
-            {title}
-          </h3>
-          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-            T-Shirt / Hoodie
-          </p>
+      {/* Details */}
+      <div className="p-3">
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          {title}
+        </h3>
+        <p className="text-sm text-zinc-500 mt-1">₹{price}</p>
+
+        {/* Size Chart */}
+        <div className="mt-3 flex items-center justify-between">
+          <Link
+            href={buyHref}
+            className="text-xs text-amber-600 flex items-center gap-2 hover:text-amber-500 transition-colors"
+          >
+            <CornerUpRight className="w-4 h-4" /> Buy Now
+          </Link>
+
+          <div className="flex gap-1">
+            {sizes.map((size) => (
+              <span
+                key={size}
+                className="text-[10px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 rounded px-1.5 py-0.5"
+              >
+                {size}
+              </span>
+            ))}
+          </div>
         </div>
-        <p className="font-semibold text-amber-600 dark:text-amber-400 text-sm sm:text-base">
-          ₹{price.toFixed(0)}
-        </p>
       </div>
-
-      {/* Glow Effect */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-          background:
-            "radial-gradient(600px circle at var(--x,50%) var(--y,50%), rgba(255,215,0,0.12), transparent 40%)",
-        }}
-      />
     </div>
   );
 }
