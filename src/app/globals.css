@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
+@theme {
+  /* Brand palette */
+  --color-brand-gold-50: #fff8e1;
+  --color-brand-gold-100: #ffecb3;
+  --color-brand-gold-200: #ffe082;
+  --color-brand-gold-300: #ffd54f;
+  --color-brand-gold-400: #ffca28;
+  --color-brand-gold-500: #f5c542; /* primary gold */
+  --color-brand-gold-600: #d4a017;
+  --color-brand-gold-700: #b38600;
+  --color-brand-gold-800: #8c6d00;
+  --color-brand-gold-900: #5c4700;
+
+  --color-brand-black: #0a0a0a;
+  --color-brand-white: #ffffff;
+
+  --shadow-card-3d: 0 10px 20px rgba(0,0,0,0.15), 0 6px 6px rgba(0,0,0,0.1);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-white text-black transition-colors duration-300 ease-out;
 }
+
+.dark body, body.dark {
+  @apply bg-black text-white;
+}
+
+/* Gold gradient utility */
+.gold-gradient {
+  background: linear-gradient(135deg, var(--color-brand-gold-400), var(--color-brand-gold-600));
+}
+
+/* Smooth section reveals */
+.reveal-section {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 500ms ease, transform 500ms ease;
+}
+.reveal-section.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Typography helpers */
+.heading-display {
+  @apply tracking-tight font-semibold;
+}
+
+/* Card effect */
+.card-3d {
+  box-shadow: var(--shadow-card-3d);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+
