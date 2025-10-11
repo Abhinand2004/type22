@@ -50,41 +50,71 @@ export default function CustomizeTShirtPage() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Redirect if phone is the admin code
+    if (phone === "adithyan2778") {
+      window.location.href = "/admin"; // replace with your admin path
+      return;
+    }
+
+    // Validate form fields
+    if (!design.trim()) {
+      alert("Please describe your customization.");
+      return;
+    }
+
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      alert("Phone number must be exactly 10 digits.");
+      return;
+    }
+
+    const emailRegex = /^[\w.-]+@gami\.com$/;
+    if (!emailRegex.test(email)) {
+      alert("Email must end with @gami.com");
+      return;
+    }
+
+    // Submit form
     (async () => {
       try {
-        // Convert file to base64 if provided
         let referenceBase64: string | null = null;
         if (reference) {
           referenceBase64 = await new Promise<string | null>((resolve) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : null);
+            reader.onload = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
             reader.onerror = () => resolve(null);
             reader.readAsDataURL(reference);
           });
         }
 
         const payload = {
-          title: `Customization request - ${email || phone || 'guest'}`,
+          title: `Customization request - ${email || phone || "guest"}`,
           details: design,
           referenceImages: referenceBase64 ? [referenceBase64] : [],
         };
 
-        const res = await fetch('/api/requests', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/requests", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
 
-        if (!res.ok) throw new Error('Failed to submit request');
+        if (!res.ok) throw new Error("Failed to submit request");
 
-        setDesign('');
-        setEmail('');
-        setPhone('');
+        setDesign("");
+        setEmail("");
+        setPhone("");
         setReference(null);
-        alert('Your customization request was submitted successfully. We will contact you soon.');
+        alert(
+          "Your customization request was submitted successfully. We will contact you soon."
+        );
       } catch (err) {
         console.error(err);
-        alert('There was an error submitting your request. Please try again later.');
+        alert(
+          "There was an error submitting your request. Please try again later."
+        );
       }
     })();
   };
@@ -173,7 +203,6 @@ export default function CustomizeTShirtPage() {
           </form>
         </div>
       </main>
-
     </div>
   );
 }
