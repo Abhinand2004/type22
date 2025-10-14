@@ -1,28 +1,14 @@
-import { Schema, model, models } from "mongoose";
+import mongoose from 'mongoose';
 
-export type UserRole = "user" | "admin";
+const UserSchema = new mongoose.Schema({
+  name: { type: String },
+  email: { type: String, required: true },
+  password: { type: String },
+  role: { type: String, default: 'user' },
+}, { timestamps: true });
 
-export interface IUser {
-  _id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  role: UserRole;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Guard against model recompile in dev
+const User = mongoose.models?.User || mongoose.model('User', UserSchema);
 
-const UserSchema = new Schema<IUser>(
-  {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true, index: true },
-    passwordHash: { type: String, required: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
-  },
-  { timestamps: true }
-);
-
-export const User = models.User || model<IUser>("User", UserSchema);
-
-
-
+export { User };
+export default User;

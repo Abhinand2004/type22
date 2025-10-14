@@ -42,7 +42,7 @@ export default function CollectionsContent() {
           Automotive Apparel Collection
         </h2>
         <p className="text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto">
-          Inspired by iconic machines, crafted for enthusiasts.
+          Wear What You Love. Drive What You Dream..
         </p>
         <div className="mx-auto w-24 h-[2px] bg-gradient-to-r from-amber-500 to-yellow-300 rounded-full"></div>
       </div>

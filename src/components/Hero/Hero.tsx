@@ -4,35 +4,40 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="mx-auto h-100% px-4 pt-16 pb-20 grid  md:grid-cols-2 items-center bg-cover bg-center bg-no-repeat rounded-2xl"
-      
+      className="mx-auto max-w-7xl px-4 pt-16 pb-20 grid md:grid-cols-2 items-center gap-8"
     >
-      <div className="space-y-6 p-6 rounded-xl">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">Type 22</h1>
-        <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-prose">
+      {/* Text Content */}
+      <div className="space-y-6 p-4 sm:p-6 md:p-0">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white">
+          For Those Who Feel Alive Behind the Wheel.
+        </h1>
+        <p className="text-lg text-zinc-300 dark:text-zinc-400 max-w-prose">
           Minimal, premium apparel inspired by the world of performance machinery.
         </p>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <a
             href="#collections"
-            className="rounded-md px-5 py-3 bg-black text-white hover:bg-zinc-800 transition"
+            className="rounded-md px-5 py-3  bg-blue-500 hover:bg-blue-600 transition"
           >
-            Shop Collections
+            <span className="text-white">Shop Collections</span>
           </a>
           <a
             href="#custom"
-            className="rounded-md px-5 py-3 border hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+            className="rounded-md px-5 py-3 border border-blue-500 text-white hover:bg-blue-500/10 transition"
           >
             Custom Request
           </a>
         </div>
       </div>
 
-      <img
-        src="/images/home.png"
-        alt="Premium apparel"
-        className="w-120 h-100 rounded-2xl"
-      />
+      {/* Image */}
+      <div className="flex justify-center md:justify-end">
+        <img
+          src="/images/home.png"
+          alt="Premium apparel"
+          className="w-full max-w-md sm:max-w-lg md:max-w-xl rounded-2xl object-cover"
+        />
+      </div>
     </section>
   );
 }

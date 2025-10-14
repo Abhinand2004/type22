@@ -1,5 +1,7 @@
 @import "tailwindcss";
-
+@import "@fontsource/rajdhani/400.css";
+@import "@fontsource/rajdhani/600.css";
+@import "@fontsource/rajdhani/700.css";
 @theme {
   /* Brand palette */
   --color-brand-gold-50: #fff8e1;
@@ -30,13 +32,45 @@
 html, body {
   height: 100%;
 }
-
-body {
-  @apply bg-white text-black transition-colors duration-300 ease-out;
+.font-rajdhani {
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.05em;
+}
+/* Theme variables: light = white background, text = flameblue; dark = black background, text = white */
+:root {
+  --bg: #ffffff; /* pure white background */
+  --text: #1e90ff; /* flame blue used for primary content in light mode */
+  --accent: #1e90ff; /* flame blue */
+  --muted: #0a0a0a; /* black for borders if needed */
 }
 
-.dark body, body.dark {
-  @apply bg-black text-white;
+.dark, body.dark {
+  --bg: #000000; /* pure black background */
+  --text: #ffffff; /* white content in dark mode */
+  --accent: #1e90ff; /* flame blue accent still available */
+  --muted: #1a1a1a;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Ensure main content elements follow the theme colors (flameblue in light, white in dark) */
+h1, h2, h3, h4, h5, h6, p, li, span, a, button, label, input {
+  color: var(--text) !important;
+}
+
+/* Links and accents use flame blue in both themes */
+a, .accent, .btn-accent {
+  color: var(--accent) !important;
+}
+
+/* Card backgrounds: keep them neutral to contrast with pure backgrounds */
+.card-3d, .card, .panel {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 /* Gold gradient utility */
@@ -57,7 +91,8 @@ body {
 
 /* Typography helpers */
 .heading-display {
-  @apply tracking-tight font-semibold;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 /* Card effect */

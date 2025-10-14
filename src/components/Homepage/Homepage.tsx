@@ -1,6 +1,5 @@
 "use client";
 
-import Featured from "@/components/Featured";
 import Story from "@/components/Story";
 import Hero from "@/components/Hero/Hero";
 import CollectionsContent from "@/components/CollectionsContent";
@@ -13,11 +12,11 @@ export default function Homepage() {
     <>
       <Hero />
 
-      <Featured />
+      <CollectionsContent />
+    
       <Story />
 
       {/* Reuse existing content sections (no new UI created here) */}
-      <CollectionsContent />
       <CustomContent />
       <CustomPage />
       <ContactPage />

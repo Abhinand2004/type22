@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Mail,
   Send,
@@ -9,149 +9,260 @@ import {
   Youtube,
   MessageCircle,
 } from "lucide-react";
-import toast, { Toaster } from "react-hot-toast";
-import emailjs from "@emailjs/browser";
 
 export default function ContactPage() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [notification, setNotification] = useState<string>("");
+  const [notificationType, setNotificationType] = useState<string>("");
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  const showNotification = (msg: string, type: string) => {
+    setNotification(msg);
+    setNotificationType(type);
+    setTimeout(() => setNotification(""), 3000);
+  };
 
   const handleSend = async () => {
     if (!email || !message) {
-      toast.error("Please fill in both fields!");
+      showNotification("Please fill in both fields!", "error");
       return;
     }
 
     setLoading(true);
 
     try {
-      await emailjs.send(
-        "service_o8wrg0c",       // Replace with your EmailJS service ID
-        "template_5yi5da6",      // Replace with your EmailJS template ID
-        { from_email: email, message },
-        "-JEZj09a0G_qA2AqV"        // Replace with your EmailJS public key
-      );
-
-      toast.success("Message sent successfully!");
+      // Replace this with your actual EmailJS implementation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      showNotification("Message sent successfully!", "success");
       setEmail("");
       setMessage("");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to send message.");
+      showNotification("Failed to send message.", "error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-background text-foreground px-4 transition-colors">
-      <Toaster position="top-right" reverseOrder={false} />
+    <div className="min-h-screen w-full overflow-hidden" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fadeInRight {
+          from {
+            opacity: 0;
+            transform: translateX(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        
+        @keyframes pulse-ring {
+          0% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+          }
+          50% {
+            box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+          }
+        }
+        
+        .animate-fadeInUp {
+          animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .animate-fadeInRight {
+          animation: fadeInRight 0.8s ease-out forwards;
+        }
+        
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-pulse-ring {
+          animation: pulse-ring 2s ease-out infinite;
+        }
+      `}</style>
 
-      <main className="w-full max-w-lg bg-card border border-border backdrop-blur-lg rounded-2xl shadow-lg p-6 space-y-6 transition-all duration-500 hover:shadow-[0_0_25px_rgba(255,200,0,0.15)]">
-        {/* Header */}
-        <div className="text-center space-y-1">
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-amber-500 to-yellow-400 bg-clip-text text-transparent">
-            Contact Us
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            We’d love to hear from you!
-          </p>
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium`} style={{ background: notificationType === 'success' ? 'var(--accent)' : 'rgba(220,38,38,0.9)' }}>
+          {notification}
         </div>
+      )}
 
-        {/* Quick Links */}
-        <div className="flex flex-wrap justify-center gap-3">
-          <a
-            href="https://wa.me/918590521956"
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-500 transition text-white px-4 py-2 rounded-full text-xs font-medium shadow hover:shadow-md"
+      {/* Theme toggle is provided in the Navbar - remove duplicate here */}
+
+      <div className="container mx-auto px-4 py-8 md:py-16">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center max-w-6xl mx-auto">
+          <div 
+            className={`space-y-6 md:space-y-8 order-2 md:order-1 ${
+              isVisible ? 'animate-fadeInRight' : 'opacity-0'
+            }`}
+            style={{ animationDelay: '0.2s' }}
           >
-            <MessageCircle className="w-4 h-4" /> WhatsApp
-          </a>
-          <a
-            href="mailto:abhinandc293@gmail.com"
-            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-400 transition text-black px-4 py-2 rounded-full text-xs font-medium shadow hover:shadow-md"
+            <div className="space-y-3">
+              <h1 className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--accent)' }}>
+                Let&apos;s Connect
+              </h1>
+              <p className="text-base md:text-lg" style={{ color: 'var(--muted)' }}>
+                Have a project in mind? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="https://wa.me/918590521956"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 transition-all px-5 py-2.5 rounded-full text-sm font-medium shadow-md hover:shadow-lg hover:scale-105 animate-pulse-ring"
+                style={{ background: 'var(--accent)', color: 'var(--bg)' }}
+              >
+                <MessageCircle className="w-4 h-4" /> <span className="text-white">WhatsApp</span>
+              </a>
+              <a
+                href="mailto:abhinandc293@gmail.com"
+                className="inline-flex items-center gap-2 transition-all px-5 py-2.5 rounded-full text-sm font-medium shadow-md hover:shadow-lg hover:scale-105"
+                style={{ background: 'transparent', color: 'var(--text)', border: '1px solid var(--muted)' }}
+              >
+                <Mail className="w-4 h-4" /> Email
+              </a>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
+                  Your Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg px-4 py-3 focus:outline-none transition-all"
+                  placeholder="you@example.com"
+                  style={{ background: 'var(--muted)', color: 'var(--text)', border: '1px solid rgba(255,255,255,0.04)' }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Message
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  rows={5}
+                  className="w-full rounded-lg px-4 py-3 focus:outline-none transition-all resize-none"
+                  placeholder="Tell us about your project..."
+                  style={{ background: 'var(--muted)', color: 'var(--text)', border: '1px solid rgba(255,255,255,0.04)' }}
+                />
+              </div>
+
+              <button
+                onClick={handleSend}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2 rounded-full px-6 py-3 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: 'var(--accent)', color: 'var(--bg)' }}
+              >
+                {loading ? "Sending..." : (
+                  <>
+                    <Send className="w-5 h-5" /> Send Message
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div 
+            className={`order-1 md:order-2 space-y-6 ${
+              isVisible ? 'animate-fadeInUp' : 'opacity-0'
+            }`}
+            style={{ animationDelay: '0.4s' }}
           >
-            <Mail className="w-4 h-4" /> Email
-          </a>
+            <div className="relative rounded-2xl overflow-hidden">
+              <img
+                src="/images/contactimg.png"
+                alt="Contact us"
+                className="w-full h-auto object-cover"
+              />
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.2), transparent)' }} />
+            </div>
+
+            <div className="flex flex-col items-center space-y-4">
+              <p className="text-sm" style={{ color: 'var(--muted)' }}>
+                Follow us on social media
+              </p>
+              <div className="flex gap-4">
+                <a
+                  href="https://instagram.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-3 rounded-full text-white hover:scale-110 transition-transform shadow-lg animate-float"
+                  style={{ animationDelay: '0s', background: 'var(--muted)', color: 'var(--text)' }}
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://facebook.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-3 rounded-full text-white hover:scale-110 transition-transform shadow-lg animate-float"
+                  style={{ animationDelay: '0.5s', background: 'var(--muted)', color: 'var(--text)' }}
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://youtube.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-3 rounded-full text-white hover:scale-110 transition-transform shadow-lg animate-float"
+                  style={{ animationDelay: '1s', background: 'var(--muted)', color: 'var(--text)' }}
+                >
+                  <Youtube className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://wa.me/918590521956"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-3 rounded-full text-white hover:scale-110 transition-transform shadow-lg animate-float animate-pulse-ring"
+                  style={{ animationDelay: '1.5s', background: 'var(--muted)', color: 'var(--text)' }}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
-
-        {/* Socials */}
-        <div className="flex justify-center gap-5 pt-1">
-          <a
-            href="https://instagram.com/"
-            target="_blank"
-            rel="noreferrer"
-            className="p-2.5 rounded-full bg-muted hover:bg-pink-600/80 transition-all hover:scale-110"
-          >
-            <Instagram className="w-4 h-4" />
-          </a>
-          <a
-            href="https://facebook.com/"
-            target="_blank"
-            rel="noreferrer"
-            className="p-2.5 rounded-full bg-muted hover:bg-blue-600/80 transition-all hover:scale-110"
-          >
-            <Facebook className="w-4 h-4" />
-          </a>
-          <a
-            href="https://youtube.com/"
-            target="_blank"
-            rel="noreferrer"
-            className="p-2.5 rounded-full bg-muted hover:bg-red-600/80 transition-all hover:scale-110"
-          >
-            <Youtube className="w-4 h-4" />
-          </a>
-          <a
-            href="https://wa.me/918590521956"
-            target="_blank"
-            rel="noreferrer"
-            className="p-2.5 rounded-full bg-muted hover:bg-green-600/80 transition-all hover:scale-110"
-          >
-            <MessageCircle className="w-4 h-4" />
-          </a>
-        </div>
-
-        {/* Contact Form */}
-        <form
-          className="grid gap-3 pt-1"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSend();
-          }}
-        >
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="rounded-md border border-input bg-muted/40 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
-            placeholder="Your Email"
-          />
-
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            required
-            className="rounded-md border border-input bg-muted/40 px-3 py-2 h-20 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
-            placeholder="Message..."
-          />
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-1 w-full flex items-center justify-center gap-2 rounded-full px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-semibold text-sm shadow hover:shadow-[0_0_10px_rgba(255,200,0,0.25)] hover:scale-[1.03] active:scale-95 transition-all disabled:opacity-50"
-          >
-            {loading ? "Sending..." : <><Send className="w-4 h-4" /> Send</>}
-          </button>
-        </form>
-
-        {/* Footer */}
-        <div className="text-center text-[10px] text-muted-foreground">
-          © {new Date().getFullYear()} Type22 Design Studio
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

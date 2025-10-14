@@ -8,8 +8,8 @@ type ProductCardProps = {
   title: string;
   imageUrl?: string;
   price?: number;
-  id?: string; // optional DB id; if provided, Buy Now links to /products/{id}
-  sizes?: string[]; // 👈 new prop for size chart
+  id?: string;
+  sizes?: string[];
 };
 
 export function ProductCard({
@@ -24,9 +24,9 @@ export function ProductCard({
     : `/products/${encodeURIComponent(title)}`;
 
   return (
-    <div className="w-full max-w-xs rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow hover:shadow-amber-300/20 transition-all duration-300">
+    <div className="w-full max-w-xs rounded-xl overflow-hidden bg-black shadow-lg hover:shadow-blue-500/30 transition-all duration-300 text-white">
       {/* Image */}
-      <div className="relative h-48 w-full overflow-hidden">
+      <div className="relative h-40 sm:h-48 w-full overflow-hidden">
         <img
           src={imageUrl}
           alt={title}
@@ -35,32 +35,35 @@ export function ProductCard({
       </div>
 
       {/* Details */}
-      <div className="p-3">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          {title}
-        </h3>
-        <p className="text-sm text-zinc-500 mt-1">₹{price}</p>
-
-        {/* Size Chart */}
-        <div className="mt-3 flex items-center justify-between">
-          <Link
-            href={buyHref}
-            className="text-xs text-amber-600 flex items-center gap-2 hover:text-amber-500 transition-colors"
-          >
-            <CornerUpRight className="w-4 h-4" /> Buy Now
-          </Link>
-
-          <div className="flex gap-1">
-            {sizes.map((size) => (
-              <span
-                key={size}
-                className="text-[10px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 rounded px-1.5 py-0.5"
-              >
-                {size}
-              </span>
-            ))}
-          </div>
+      <div className="p-3 sm:p-4 flex flex-col gap-3">
+        {/* Title & Price */}
+        <div className="flex justify-between items-center">
+          <h3 className="text-sm sm:text-base font-semibold">{title}</h3>
+          <p className="text-sm sm:text-base font-medium text-blue-400">
+            ₹{price}
+          </p>
         </div>
+
+        {/* Sizes */}
+        <div className="flex justify-center gap-2 flex-wrap">
+          {sizes.map((size) => (
+            <span
+              key={size}
+              className="text-[8px] sm:text-[10px] md:text-xs font-medium border border-blue-500 rounded px-2 py-1 sm:px-2 sm:py-2"
+            >
+              {size}
+            </span>
+          ))}
+        </div>
+
+        {/* Buy Now Button */}
+        <Link
+          href={buyHref}
+          className="mt-2 w-full text-center py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 font-semibold transition-all flex items-center justify-center gap-2"
+        >
+          <CornerUpRight className="w-4 h-4 text-white" />
+          <span className="text-white text-sm sm:text-base">Buy Now</span>
+        </Link>
       </div>
     </div>
   );

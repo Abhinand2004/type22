@@ -1,18 +1,10 @@
-"use client";
+import React from 'react';
 
 export default function ContactContent() {
   return (
-    <section id="contact" className="mx-auto max-w-7xl px-4 py-12 scroll-mt-24">
-      <h2 className="heading-display text-2xl mb-2">Contact</h2>
-      <p className="text-zinc-600 dark:text-zinc-400">Questions? Reach out via WhatsApp or email.</p>
-      <div className="mt-4 flex flex-col sm:flex-row gap-3">
-        <button
-          onClick={() => alert("Contact placeholder")}
-          className="rounded-md px-5 py-2.5 border text-center"
-        >
-          Contact Us
-        </button>
-      </div>
-    </section>
+    <div className="w-full py-8 text-center">
+      <h3 style={{ color: 'var(--accent)' }} className="text-xl font-semibold">Contact</h3>
+      <p style={{ color: 'var(--muted)' }} className="mt-2">Reach out via WhatsApp or Email.</p>
+    </div>
   );
 }
