@@ -22,17 +22,28 @@ type P = {
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<P[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         const res = await fetch('/api/products');
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
-        if (mounted) setProducts(data as P[]);
+        if (!res.ok) {
+          const msg = await res.text().catch(() => 'Failed to fetch');
+          console.error('Fetch /api/products failed:', msg);
+          if (mounted) {
+            setError(msg || 'Failed to fetch products');
+            setProducts([]);
+          }
+        } else {
+          const data = await res.json();
+          if (mounted) setProducts((data || []) as P[]);
+        }
       } catch (err) {
-        console.error(err);
+        const msg = err instanceof Error ? err.message : 'Failed to fetch products';
+        console.error('/api/products error:', err);
+        if (mounted) setError(msg);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -67,6 +78,7 @@ export default function AdminProductsPage() {
         </section>
 
         {loading ? <div className="text-sm text-zinc-500">Loading products...</div> : null}
+        {error ? <div className="mt-2 text-sm text-rose-400">{error}</div> : null}
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
           {products.map((p) => (
@@ -102,8 +114,13 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
           if (!up.ok) {
             let detail: unknown = undefined;
             try {
-              const maybeJson = await up.json();
-              detail = (maybeJson as any)?.detail ?? maybeJson;
+              const maybeJson: unknown = await up.json();
+              if (typeof maybeJson === 'object' && maybeJson !== null && 'detail' in maybeJson) {
+                const withDetail = maybeJson as { detail?: unknown };
+                detail = withDetail.detail ?? maybeJson;
+              } else {
+                detail = maybeJson;
+              }
             } catch {
               try { detail = await up.text(); } catch { /* noop */ }
             }

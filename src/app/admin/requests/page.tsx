@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import Image from 'next/image';
 
 type RequestItem = {
   _id: string;
@@ -78,7 +79,9 @@ export default function AdminRequests() {
                   <div className="mt-3 grid grid-cols-3 gap-2">
                     {r.referenceImages.map((img, i) => (
                       <div key={i} className="flex flex-col items-stretch gap-2">
-                        <img src={img} alt={`ref-${i}`} className="w-full h-24 object-cover rounded" />
+                        <div className="relative w-full h-24">
+                          <Image src={img} alt={`ref-${i}`} fill className="object-cover rounded" />
+                        </div>
                         <div className="flex gap-2 justify-between items-center">
                           <a
                             href={img}
