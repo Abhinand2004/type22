@@ -24,13 +24,17 @@ export default function ContactPage() {
 
   // Cursor glow effect
   useEffect(() => {
-    const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
+    const handleMouseMove = (e: MouseEvent) =>
+      setMousePos({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   // Notification handler
-  const showNotification = (msg, type) => {
+  const showNotification = (
+    msg: string,
+    type: "success" | "error"
+  ) => {
     setNotification({ show: true, message: msg, type });
     setTimeout(() => setNotification({ show: false, message: "", type: "" }), 3000);
   };
@@ -146,7 +150,7 @@ export default function ContactPage() {
               viewport={{ once: false }}
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               placeholder="Your Email"
               className="w-full rounded-xl bg-white/5 backdrop-blur-md px-5 py-3 text-white placeholder-gray-500 focus:outline-none border border-white/10 focus:border-cyan-400/50"
             />
@@ -156,7 +160,7 @@ export default function ContactPage() {
               transition={{ delay: 0.7 }}
               viewport={{ once: false }}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
               placeholder="Your Message"
               className="w-full rounded-xl bg-white/5 backdrop-blur-md px-5 py-3 h-32 text-white placeholder-gray-500 focus:outline-none border border-white/10 focus:border-cyan-400/50 resize-none"
             />
@@ -188,7 +192,9 @@ export default function ContactPage() {
             transition={{ delay: 0.3, duration: 1, ease: "easeOut" }}
             viewport={{ once: false }}
             className="w-72 lg:w-[36rem] object-contain drop-shadow-[0_25px_60px_rgba(0,200,255,0.4)]"
-            onError={(e) => (e.target.style.display = "none")}
+            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+              e.currentTarget.style.display = "none";
+            }}
           />
 
           <motion.div

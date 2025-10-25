@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React from "react";
 import { CornerUpRight } from "lucide-react";
+import Image from "next/image";
 
 type ProductCardProps = {
   title: string;
@@ -27,10 +28,12 @@ export function ProductCard({
     <div className="w-full max-w-xs rounded-xl overflow-hidden bg-black shadow-lg hover:shadow-blue-500/30 transition-all duration-300 text-white">
       {/* Image */}
       <div className="relative h-40 sm:h-48 w-full overflow-hidden">
-        <img
+        <Image
           src={imageUrl}
           alt={title}
-          className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-500"
+          fill
+          sizes="(max-width: 640px) 100vw, 384px"
+          className="object-cover transform hover:scale-105 transition-transform duration-500"
         />
       </div>
 
