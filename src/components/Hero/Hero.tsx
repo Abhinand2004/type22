@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -36,18 +37,18 @@ export default function Hero() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
         >
-          <a
+          <Link
             href="#collections"
             className="rounded-md px-5 py-3 bg-blue-500 hover:bg-blue-600 transition"
           >
             <span className="text-white">Shop Collections</span>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/custom"
             className="rounded-md px-5 py-3 border border-blue-500 text-white hover:bg-blue-500/10 transition"
           >
             Custom Request
-          </a>
+          </Link>
         </motion.div>
       </motion.div>
 
