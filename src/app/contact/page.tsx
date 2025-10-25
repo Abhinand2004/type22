@@ -2,267 +2,248 @@
 
 import { useState, useEffect } from "react";
 import {
-  Mail,
-  Send,
+  MessageCircle,
+  Sparkles,
+  Zap,
   Instagram,
   Facebook,
   Youtube,
-  MessageCircle,
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function ContactPage() {
-  const [email, setEmail] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [notification, setNotification] = useState<string>("");
-  const [notificationType, setNotificationType] = useState<string>("");
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [notification, setNotification] = useState({
+    show: false,
+    message: "",
+    type: "",
+  });
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
+  // Cursor glow effect
   useEffect(() => {
-    setIsVisible(true);
+    const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const showNotification = (msg: string, type: string) => {
-    setNotification(msg);
-    setNotificationType(type);
-    setTimeout(() => setNotification(""), 3000);
+  // Notification handler
+  const showNotification = (msg, type) => {
+    setNotification({ show: true, message: msg, type });
+    setTimeout(() => setNotification({ show: false, message: "", type: "" }), 3000);
   };
 
+  // Form submit
   const handleSend = async () => {
-    if (!email || !message) {
-      showNotification("Please fill in both fields!", "error");
-      return;
-    }
+    if (!email || !message)
+      return showNotification("Please fill in both fields!", "error");
 
     setLoading(true);
-
     try {
-      // Replace this with your actual EmailJS implementation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       showNotification("Message sent successfully!", "success");
       setEmail("");
       setMessage("");
-    } catch (err) {
-      console.error(err);
+    } catch {
       showNotification("Failed to send message.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen w-full overflow-hidden" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes fadeInRight {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-        
-        @keyframes pulse-ring {
-          0% {
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-          }
-          50% {
-            box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-          }
-        }
-        
-        .animate-fadeInUp {
-          animation: fadeInUp 0.8s ease-out forwards;
-        }
-        
-        .animate-fadeInRight {
-          animation: fadeInRight 0.8s ease-out forwards;
-        }
-        
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        .animate-pulse-ring {
-          animation: pulse-ring 2s ease-out infinite;
-        }
-      `}</style>
+  const socialLinks = [
+    { icon: Instagram, href: "https://instagram.com/", color: "text-pink-500" },
+    { icon: Facebook, href: "https://facebook.com/", color: "text-blue-500" },
+    { icon: Youtube, href: "https://youtube.com/", color: "text-red-500" },
+    { icon: MessageCircle, href: "https://wa.me/918590521956", color: "text-green-500" },
+  ];
 
-      {notification && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium`} style={{ background: notificationType === 'success' ? 'var(--accent)' : 'rgba(220,38,38,0.9)' }}>
-          {notification}
-        </div>
+  return (
+    <motion.section
+      id="contact"
+      className="min-h-screen w-full bg-black text-white relative overflow-hidden flex items-center justify-center"
+      initial={{ opacity: 0, y: 80 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
+      viewport={{ once: false, amount: 0.3 }}
+    >
+      {/* Cursor Glow */}
+      <motion.div
+        className="pointer-events-none fixed w-72 h-72 rounded-full blur-3xl opacity-30"
+        animate={{
+          x: mousePos.x - 144,
+          y: mousePos.y - 144,
+        }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        style={{
+          background:
+            "radial-gradient(circle, rgba(0,200,255,0.3) 0%, transparent 70%)",
+        }}
+      />
+
+      {/* Notification */}
+      {notification.show && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-xl backdrop-blur-md border ${
+            notification.type === "success"
+              ? "bg-green-500/20 border-green-500/50 text-green-400"
+              : "bg-red-500/20 border-red-500/50 text-red-400"
+          } font-medium shadow-lg`}
+        >
+          <div className="flex items-center gap-2">
+            {notification.type === "success" ? (
+              <Sparkles className="w-5 h-5" />
+            ) : (
+              <Zap className="w-5 h-5" />
+            )}
+            {notification.message}
+          </div>
+        </motion.div>
       )}
 
-      {/* Theme toggle is provided in the Navbar - remove duplicate here */}
-
-      <div className="container mx-auto px-4 py-8 md:py-16">
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center max-w-6xl mx-auto">
-          <div 
-            className={`space-y-6 md:space-y-8 order-2 md:order-1 ${
-              isVisible ? 'animate-fadeInRight' : 'opacity-0'
-            }`}
-            style={{ animationDelay: '0.2s' }}
+      {/* Main Content */}
+      <div className="flex flex-col-reverse lg:flex-row items-center justify-center max-w-7xl w-full px-4 lg:px-8 py-12 gap-10">
+        {/* Left: Form Section */}
+        <motion.div
+          initial={{ opacity: 0, x: -80 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          viewport={{ once: false, amount: 0.3 }}
+          className="w-full lg:w-1/2 space-y-6"
+        >
+          <motion.h2
+            initial={{ opacity: 0, y: -30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            viewport={{ once: false }}
+            className="text-3xl lg:text-4xl font-bold tracking-tight"
           >
-            <div className="space-y-3">
-              <h1 className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--accent)' }}>
-                Let&apos;s Connect
-              </h1>
-              <p className="text-base md:text-lg" style={{ color: 'var(--muted)' }}>
-                Have a project in mind? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
-              </p>
-            </div>
+            <span className="block text-white">Let&apos;s Create</span>
+            <span className="block text-cyan-400">Something Amazing</span>
+          </motion.h2>
 
-            <div className="flex flex-wrap gap-3">
-              <a
-                href="https://wa.me/918590521956"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 transition-all px-5 py-2.5 rounded-full text-sm font-medium shadow-md hover:shadow-lg hover:scale-105 animate-pulse-ring"
-                style={{ background: 'var(--accent)', color: 'var(--bg)' }}
-              >
-                <MessageCircle className="w-4 h-4" /> <span className="text-white">WhatsApp</span>
-              </a>
-              <a
-                href="mailto:abhinandc293@gmail.com"
-                className="inline-flex items-center gap-2 transition-all px-5 py-2.5 rounded-full text-sm font-medium shadow-md hover:shadow-lg hover:scale-105"
-                style={{ background: 'transparent', color: 'var(--text)', border: '1px solid var(--muted)' }}
-              >
-                <Mail className="w-4 h-4" /> Email
-              </a>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
-                  Your Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg px-4 py-3 focus:outline-none transition-all"
-                  placeholder="you@example.com"
-                  style={{ background: 'var(--muted)', color: 'var(--text)', border: '1px solid rgba(255,255,255,0.04)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Message
-                </label>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows={5}
-                  className="w-full rounded-lg px-4 py-3 focus:outline-none transition-all resize-none"
-                  placeholder="Tell us about your project..."
-                  style={{ background: 'var(--muted)', color: 'var(--text)', border: '1px solid rgba(255,255,255,0.04)' }}
-                />
-              </div>
-
-              <button
-                onClick={handleSend}
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-2 rounded-full px-6 py-3 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: 'var(--accent)', color: 'var(--bg)' }}
-              >
-                {loading ? "Sending..." : (
-                  <>
-                    <Send className="w-5 h-5" /> Send Message
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          <div 
-            className={`order-1 md:order-2 space-y-6 ${
-              isVisible ? 'animate-fadeInUp' : 'opacity-0'
-            }`}
-            style={{ animationDelay: '0.4s' }}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            viewport={{ once: false }}
+            className="text-gray-400 text-base lg:text-lg max-w-md"
           >
-            <div className="relative rounded-2xl overflow-hidden">
-              <img
-                src="/images/contactimg.png"
-                alt="Contact us"
-                className="w-full h-auto object-cover"
-              />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.2), transparent)' }} />
-            </div>
+            Transform your ideas into reality. Drop us a message and let&apos;s start
+            building the future together.
+          </motion.p>
 
-            <div className="flex flex-col items-center space-y-4">
-              <p className="text-sm" style={{ color: 'var(--muted)' }}>
-                Follow us on social media
-              </p>
-              <div className="flex gap-4">
-                <a
-                  href="https://instagram.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-3 rounded-full text-white hover:scale-110 transition-transform shadow-lg animate-float"
-                  style={{ animationDelay: '0s', background: 'var(--muted)', color: 'var(--text)' }}
-                >
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a
-                  href="https://facebook.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-3 rounded-full text-white hover:scale-110 transition-transform shadow-lg animate-float"
-                  style={{ animationDelay: '0.5s', background: 'var(--muted)', color: 'var(--text)' }}
-                >
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a
-                  href="https://youtube.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-3 rounded-full text-white hover:scale-110 transition-transform shadow-lg animate-float"
-                  style={{ animationDelay: '1s', background: 'var(--muted)', color: 'var(--text)' }}
-                >
-                  <Youtube className="w-5 h-5" />
-                </a>
-                <a
-                  href="https://wa.me/918590521956"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-3 rounded-full text-white hover:scale-110 transition-transform shadow-lg animate-float animate-pulse-ring"
-                  style={{ animationDelay: '1.5s', background: 'var(--muted)', color: 'var(--text)' }}
-                >
-                  <MessageCircle className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
+          <div className="space-y-4">
+            <motion.input
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              viewport={{ once: false }}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Your Email"
+              className="w-full rounded-xl bg-white/5 backdrop-blur-md px-5 py-3 text-white placeholder-gray-500 focus:outline-none border border-white/10 focus:border-cyan-400/50"
+            />
+            <motion.textarea
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              viewport={{ once: false }}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Your Message"
+              className="w-full rounded-xl bg-white/5 backdrop-blur-md px-5 py-3 h-32 text-white placeholder-gray-500 focus:outline-none border border-white/10 focus:border-cyan-400/50 resize-none"
+            />
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSend}
+              disabled={loading}
+              className="w-full py-3 font-bold text-white rounded-xl bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-transform disabled:opacity-50"
+            >
+              {loading ? "Sending..." : "Send Message"}
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Right: Image + Social Links */}
+        <motion.div
+          initial={{ opacity: 0, x: 80 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          viewport={{ once: false, amount: 0.3 }}
+          className="w-full lg:w-1/2 flex flex-col items-center space-y-8"
+        >
+          <motion.img
+            src="/images/premium.png"
+            alt="Contact"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 1, ease: "easeOut" }}
+            viewport={{ once: false }}
+            className="w-72 lg:w-[36rem] object-contain drop-shadow-[0_25px_60px_rgba(0,200,255,0.4)]"
+            onError={(e) => (e.target.style.display = "none")}
+          />
+
+          <motion.div
+            className="flex gap-6"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.2, delayChildren: 0.3 },
+              },
+            }}
+          >
+            {socialLinks.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <motion.a
+                  key={i}
+                  href={s.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`text-white ${s.color}`}
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { type: "spring", stiffness: 120 },
+                    },
+                  }}
+                  whileHover={{ scale: 1.4, rotate: 12 }}
+                  animate={{
+                    x: [0, 4, 0, -3, 0],
+                    y: [0, -12, 0, 8, 0],
+                    rotate: [0, 8, 0, -6, 0],
+                    scale: [1, 1.08, 1],
+                  }}
+                  transition={{
+                    duration: 2.1 + i * 0.15,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                    delay: i * 0.1,
+                  }}
+                  style={{ willChange: "transform" }}
+                >
+                  <Icon className="w-6 h-6 lg:w-8 lg:h-8" />
+                </motion.a>
+              );
+            })}
+          </motion.div>
+        </motion.div>
       </div>
-    </div>
+    </motion.section>
   );
 }

@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function AdminHome() {
+export default async function AdminHome() {
+  const jar = await cookies();
+  const cookie = jar.get("admin_auth");
+  const isAuthed = cookie?.value === "1";
+  if (!isAuthed) redirect("/admin/login");
   return (
     <div>
       <Navbar />
@@ -18,6 +24,9 @@ export default function AdminHome() {
     </div>
   );
 }
+
+
+
 
 
 

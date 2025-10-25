@@ -1,53 +1,33 @@
 "use client";
-
-import { motion, useAnimation, Variants } from "framer-motion";
-import { useEffect, useRef } from "react";
+import type { ReactNode } from "react";
+import { AnimateInView } from "./AnimateInView";
 
 type RevealProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
+  once?: boolean;
+  rootMargin?: string;
   delay?: number;
+  duration?: number;
 };
 
-const variants: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0 },
-};
-
-export function Reveal({ children, className, delay = 0 }: RevealProps) {
-  const controls = useAnimation();
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            controls.start("visible");
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [controls]);
-
+export function Reveal({
+  children,
+  className,
+  once = true,
+  rootMargin = "-10% 0px -10% 0px",
+  delay = 0,
+  duration = 0.5,
+}: RevealProps) {
   return (
-    <motion.div
-      ref={ref}
+    <AnimateInView
       className={className}
-      variants={variants}
-      initial="hidden"
-      animate={controls}
-      transition={{ duration: 0.6, ease: "easeOut", delay }}
+      once={once}
+      rootMargin={rootMargin}
+      delay={delay}
+      duration={duration}
     >
       {children}
-    </motion.div>
+    </AnimateInView>
   );
 }
-
-
-

@@ -1,24 +1,20 @@
 "use client";
 
-import Story from "@/components/Story";
+import dynamic from 'next/dynamic';
 import Hero from "@/components/Hero/Hero";
 import CollectionsContent from "@/components/CollectionsContent";
-import CustomContent from "@/components/CustomContent";
-import ContactContent from "@/components/ContactContent";
-import CustomPage from "@/app/custom/page";
-import ContactPage from "@/app/contact/page";
+
+// Load app pages as client-only dynamic imports to avoid bundling browser globals into the server bundle
+const ContactPage = dynamic(() => import('@/app/contact/page'), { ssr: false });
+
+
 export default function Homepage() {
   return (
     <>
       <Hero />
 
       <CollectionsContent />
-    
-      <Story />
 
-      {/* Reuse existing content sections (no new UI created here) */}
-      <CustomContent />
-      <CustomPage />
       <ContactPage />
     </>
   );

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Menu, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Typography } from "@mui/material";
+import { Orbitron } from "next/font/google";
+
+const orbitron = Orbitron({ subsets: ["latin"], weight: ["400","500","600","700","800","900"], display: "swap" });
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -21,18 +22,18 @@ export function Navbar() {
 
   const links = [
     { name: "Home", id: "home", path: "/" },
-    { name: "Collections", id: "collections" },
-    { name: "Custom", id: "custom" },
+    { name: "Collections", id: "collections", path: "/collections" },
+    { name: "Custom", path: "/custom" },
+    { name: "About", path: "/about" },
     { name: "Contact", id: "contact" },
   ];
 
   const features = [
     { name: "FAQ", path: "/faq" },
     { name: "Size Guide", path: "/size-guide" },
-    { name: "Shipping/Returns", path: "/shipping-returns" },
   ];
 
-  const handleNavigate = (link: { id?: string; path?: string; name?: string }) => {
+  const handleNavigate = (link: { name: string; id?: string; path?: string }) => {
     if (link.path === "/" && pathname === "/") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setOpen(false);
@@ -51,54 +52,54 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-gradient-to-r from-black via-[#010a18] to-[#001530] border-b border-blue-500/20 shadow-[0_0_20px_rgba(0,180,255,0.3)]">
+    <header className={`${orbitron.className} sticky top-0 z-50 backdrop-blur-md bg-gradient-to-r from-black via-[#010a18] to-[#001530] border-b border-blue-500/20 shadow-[0_0_20px_rgba(0,180,255,0.3)]`}>
       <div className="mx-auto max-w-7xl px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={handleLogoClick}>
             <Image
-              src="/images/logo.png"
+              src="/images/logo.svg"
               alt="Logo"
               width={120}
               height={40}
               priority
-              className="object-contain h-10 w-auto"
+              className="object-contain"
             />
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3">
-            {/* Desktop Links */}
-            <nav className="hidden sm:flex items-center gap-6">
-              {links.map((link) => (
-                <motion.button
-                  key={link.name}
-                  onClick={() => handleNavigate(link)}
-                  whileHover={{
-                    scale: 1.08,
-                    textShadow: "0px 0px 10px #00baff",
-                    color: "#00baff",
-                  }}
-                  transition={{ duration: 0.25 }}
-                  className="text-white font-rajdhani text-lg tracking-wider uppercase"
-                >
-                  {link.name}
-                </motion.button>
-              ))}
+          {/* Desktop Links */}
+          <nav className="hidden sm:flex items-center gap-6">
+            {links.map((link) => (
+              <motion.button
+                key={link.name}
+                onClick={() => handleNavigate(link)}
+                whileHover={{
+                  scale: 1.08,
+                  textShadow: "0px 0px 10px #00baff",
+                  color: "#00baff",
+                }}
+                transition={{ duration: 0.25 }}
+                className="text-white font-rajdhani text-lg tracking-wider uppercase"
+              >
+                {link.name}
+              </motion.button>
+            ))}
 
-              {/* Features Dropdown */}
-              <div className="relative">
-                <motion.button
-                  whileHover={{
-                    scale: 1.08,
-                    textShadow: "0px 0px 10px #00baff",
-                    color: "#00baff",
-                  }}
-                  onClick={() => setFeaturesOpen((v) => !v)}
-                  className="flex items-center gap-1 text-white font-rajdhani text-lg uppercase tracking-wider"
-                >
-                  Features <ChevronDown size={16} />
-                </motion.button>
+            {/* Features Dropdown */}
+            <div className="relative">
+              <motion.button
+                whileHover={{
+                  scale: 1.08,
+                  textShadow: "0px 0px 10px #00baff",
+                  color: "#00baff",
+                }}
+                onClick={() => setFeaturesOpen((v) => !v)}
+                className="flex items-center gap-1 text-white font-rajdhani text-lg uppercase tracking-wider"
+              >
+                Features <ChevronDown size={16} />
+              </motion.button>
 
+              <AnimatePresence>
                 {featuresOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -117,18 +118,17 @@ export function Navbar() {
                     ))}
                   </motion.div>
                 )}
-              </div>
-            </nav>
+              </AnimatePresence>
+            </div>
+          </nav>
 
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
-            {/* Mobile Menu Button */}
+          {/* Mobile Menu Button */}
+          <div className="sm:hidden">
             <button
-              className="sm:hidden inline-flex items-center justify-center h-10 w-10 rounded-md border border-blue-500/50 hover:bg-blue-500/10 text-white transition-colors"
-              onClick={() => setOpen((v) => !v)}
+              onClick={() => setOpen((prev) => !prev)}
+              className="text-white hover:text-blue-400 transition-all"
             >
-              <Menu size={18} />
+              {open ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>

@@ -1,7 +1,4 @@
 @import "tailwindcss";
-@import "@fontsource/rajdhani/400.css";
-@import "@fontsource/rajdhani/600.css";
-@import "@fontsource/rajdhani/700.css";
 @theme {
   /* Brand palette */
   --color-brand-gold-50: #fff8e1;
@@ -23,6 +20,8 @@
 
 :root {
   color-scheme: light;
+
+  scrollbar-width: none;
 }
 
 .dark {
@@ -32,16 +31,17 @@
 html, body {
   height: 100%;
 }
+/* Retain existing utility class name but map to Poppins */
 .font-rajdhani {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: var(--font-poppins), sans-serif;
   letter-spacing: 0.05em;
 }
 /* Theme variables: light = white background, text = flameblue; dark = black background, text = white */
 :root {
-  --bg: #ffffff; /* pure white background */
-  --text: #1e90ff; /* flame blue used for primary content in light mode */
+  --bg: #000000; /* force black background by default */
+  --text: #ffffff; /* force white text by default */
   --accent: #1e90ff; /* flame blue */
-  --muted: #0a0a0a; /* black for borders if needed */
+  --muted: #1a1a1a; /* subtle dark border */
 }
 
 .dark, body.dark {
@@ -55,11 +55,17 @@ body {
   background: var(--bg);
   color: var(--text);
   transition: background-color 200ms ease, color 200ms ease;
+  font-family: var(--font-poppins), sans-serif;
 }
 
 /* Ensure main content elements follow the theme colors (flameblue in light, white in dark) */
 h1, h2, h3, h4, h5, h6, p, li, span, a, button, label, input {
   color: var(--text) !important;
+}
+
+/* Headings use Poppins globally */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-poppins), sans-serif;
 }
 
 /* Links and accents use flame blue in both themes */
@@ -101,5 +107,6 @@ a, .accent, .btn-accent {
   transform-style: preserve-3d;
   will-change: transform;
 }
+
 
 

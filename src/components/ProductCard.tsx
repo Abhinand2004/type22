@@ -14,7 +14,7 @@ type ProductCardProps = {
 
 export function ProductCard({
   title,
-  imageUrl = "/hero.svg",
+  imageUrl = "/images/logo.svg",
   price = 0,
   id,
   sizes = ["S", "M", "L", "XL"],
@@ -68,3 +68,4 @@ export function ProductCard({
     </div>
   );
 }
+

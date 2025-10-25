@@ -9,7 +9,7 @@ if (!MONGODB_URI) {
 }
 
 type Cached = {
-  conn: typeof mongoose | null;
+  conn: mongoose.Mongoose | null;
   promise: Promise<typeof mongoose> | null;
 };
 
@@ -26,12 +26,21 @@ export async function connectToDatabase() {
     cached.promise = mongoose
       .connect(MONGODB_URI, {
         dbName: process.env.MONGODB_DB || "type22",
+        // Connection pool and timeouts for better perf under load
+        maxPoolSize: 10,
+        minPoolSize: 0,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 20000,
+        retryWrites: true,
+        w: "majority",
       })
-      .then((m) => m);
+      .then((m) => m)
+      .catch((err) => {
+        cached.promise = null;
+        throw err;
+      });
   }
   cached.conn = await cached.promise;
   global.mongooseCache = cached;
   return cached.conn;
 }
-
-

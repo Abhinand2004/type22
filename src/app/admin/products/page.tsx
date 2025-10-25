@@ -85,7 +85,7 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
   const [category, setCategory] = useState<'tshirt'|'hoodie'>('tshirt');
   const [sizesText, setSizesText] = useState('S,M,L');
   const [colorsText, setColorsText] = useState('black,white');
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
 
   async function handleCreate(e: React.FormEvent) {
@@ -93,9 +93,28 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
     setSaving(true);
     try {
       let images: string[] = [];
-      if (file) {
-        const r = await toBase64(file);
-        images = [r as string];
+      if (files.length) {
+        const uploaded: string[] = [];
+        for (const f of files) {
+          const fd = new FormData();
+          fd.append('file', f);
+          const up = await fetch('/api/uploads', { method: 'POST', body: fd });
+          if (!up.ok) {
+            let detail: unknown = undefined;
+            try {
+              const maybeJson = await up.json();
+              detail = (maybeJson as any)?.detail ?? maybeJson;
+            } catch {
+              try { detail = await up.text(); } catch { /* noop */ }
+            }
+            console.error('Upload failed', detail);
+            throw new Error('Image upload failed');
+          }
+          const upJson = (await up.json()) as { url?: string };
+          if (!upJson.url) throw new Error('No URL from upload');
+          uploaded.push(upJson.url);
+        }
+        images = uploaded;
       }
       const payload = {
         title,
@@ -110,7 +129,7 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
       if (!res.ok) throw new Error('create failed');
       const created = await res.json();
       onCreated?.(created);
-      setTitle(''); setPrice(499); setDescription(''); setFile(null);
+      setTitle(''); setPrice(499); setDescription(''); setFiles([]);
     } catch (err) {
       console.error(err);
       alert('Failed to create');
@@ -125,9 +144,30 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
         <option value="tshirt">T-Shirt</option>
         <option value="hoodie">Hoodie</option>
       </select>
-      <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+      <input multiple type="file" onChange={(e) => setFiles(Array.from(e.target.files ?? []))} />
       <input className="p-2 rounded border" placeholder="Sizes (comma separated)" value={sizesText} onChange={(e) => setSizesText(e.target.value)} />
-      <input className="p-2 rounded border" placeholder="Colors (comma separated)" value={colorsText} onChange={(e) => setColorsText(e.target.value)} />
+      <div className="flex flex-col gap-2">
+        <input className="p-2 rounded border" placeholder="Colors (comma separated)" value={colorsText} onChange={(e) => setColorsText(e.target.value)} />
+        <div className="flex flex-wrap gap-2 text-xs">
+          {['black','white','red','blue','green','yellow','purple','pink','gray','navy'].map((c) => {
+            const selected = colorsText.split(',').map(s=>s.trim()).filter(Boolean);
+            const isSel = selected.includes(c);
+            return (
+              <button
+                type="button"
+                key={c}
+                onClick={() => {
+                  let next = selected;
+                  if (isSel) next = selected.filter(s=>s!==c);
+                  else next = [...selected, c];
+                  setColorsText(next.join(','));
+                }}
+                className={`px-2 py-1 rounded border ${isSel ? 'bg-blue-600 text-white' : 'bg-white/5'}`}
+              >{c}</button>
+            );
+          })}
+        </div>
+      </div>
       <textarea className="p-2 rounded border md:col-span-4" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
       <div className="md:col-span-4">
         <button disabled={saving} className="px-4 py-2 bg-green-600 text-white rounded">Create Product</button>
@@ -136,14 +176,8 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
   );
 }
 
-function toBase64(file: File) {
-  return new Promise<string | ArrayBuffer | null>((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = () => res(reader.result);
-    reader.onerror = rej;
-    reader.readAsDataURL(file);
-  });
-}
+
+
 
 
 
