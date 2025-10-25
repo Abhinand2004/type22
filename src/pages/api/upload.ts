@@ -64,7 +64,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .digest("hex");
 
     const form = new FormData();
-    form.append("file", new Blob([file.buffer], { type: file.mimetype }), file.originalname);
+    // Convert Node Buffer to Uint8Array to satisfy BlobPart typings in Node/TS
+    form.append(
+      "file",
+      new Blob([new Uint8Array(file.buffer)], { type: file.mimetype }),
+      file.originalname
+    );
     form.append("folder", folder);
     form.append("timestamp", String(timestamp));
     form.append("api_key", conf.apiKey);
