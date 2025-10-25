@@ -2,7 +2,7 @@
 
 import { useState, FormEvent, Suspense, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
+import { OrbitControls, useGLTF, Environment, Float } from "@react-three/drei";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import * as THREE from "three";
 import type { GLTF } from "three-stdlib";
@@ -130,9 +130,9 @@ export default function CustomizeTShirtPage() {
             <hemisphereLight intensity={0.35} />
 
             <Suspense fallback={null}>
-              <motion.group animate={bounceVariant}>
+              <Float floatIntensity={1.2} speed={1.5} rotationIntensity={0}>
                 <TShirtModel model={models[currentModel]} />
-              </motion.group>
+              </Float>
               <Environment preset="studio" />
             </Suspense>
 
@@ -171,26 +171,26 @@ export default function CustomizeTShirtPage() {
             <textarea
               placeholder="Describe your customization..."
               value={design}
-              onChange={(e) => setDesign(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDesign(e.target.value)}
               className="w-full p-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none h-24"
             />
             <input
               type="email"
               placeholder="Your Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               className="w-full p-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
             <input
               type="tel"
               placeholder="Phone Number"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhone(e.target.value)}
               className="w-full p-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
             <input
               type="file"
-              onChange={(e) => setReference(e.target.files?.[0] ?? null)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setReference(e.currentTarget.files?.[0] ?? null)}
               className="w-full p-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
 

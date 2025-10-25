@@ -220,7 +220,7 @@ Remember: You're here to help customers learn about Type22 products and guide th
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 30 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="relative p-5 border-b border-blue-500/20 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900">
@@ -411,8 +411,8 @@ Remember: You're here to help customers learn about Type22 products and guide th
                   ref={inputRef}
                   type="text"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === "Enter" && handleSend()}
                   className="w-full border-2 border-blue-500/40 rounded-2xl p-3 pr-10 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-900 text-white placeholder-gray-400 transition-all"
                   placeholder="Ask about Type22 tees..."
                   disabled={loading}
@@ -435,7 +435,6 @@ Remember: You're here to help customers learn about Type22 products and guide th
                 <SendHorizonal className="w-5 h-5" />
               </motion.button>
             </div>
-            
             {/* Quick Actions */}
             <div className="flex gap-2 mt-3 flex-wrap">
               {["Show Products", "Custom Design?", "Pricing?"].map((action) => (
