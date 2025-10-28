@@ -22,8 +22,11 @@ export async function GET(req: Request) {
   const average = total > 0 ? sum / total : 0;
   let userRating: number | null = null;
   if (clientId) {
-    const r = await Rating.findOne({ productId: new Types.ObjectId(productId), clientId }).lean();
-    userRating = (r?.stars as number | undefined) ?? null;
+    const r = await Rating.findOne(
+      { productId: new Types.ObjectId(productId), clientId },
+      { stars: 1 }
+    ).lean<{ stars?: number }>();
+    userRating = r?.stars ?? null;
   }
   return NextResponse.json({ counts, total, average, userRating });
 }
