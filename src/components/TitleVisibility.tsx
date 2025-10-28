@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 export default function TitleVisibility() {
   const originalTitleRef = useRef<string | null>(null);
-  const hiddenTitle = "continew next project";
+  const hiddenTitle = "Continue shopping";
 
   useEffect(() => {
     const getTitle = () => document?.title || "";
