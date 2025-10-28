@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, Variants } from "framer-motion";
 import { ProductCard } from "@/components/ProductCard";
+import FiltersBar from "@/components/FiltersBar";
 
 type DBProduct = {
   _id: string;
@@ -12,6 +13,9 @@ type DBProduct = {
   images?: string[];
   colors?: string[];
   sizes?: string[];
+  category?: 'tshirt' | 'hoodie';
+  theme?: 'car' | 'bike' | 'none';
+  brand?: string;
 };
 
 export default function CollectionsContent() {
@@ -19,6 +23,12 @@ export default function CollectionsContent() {
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const [inViewTrigger, setInViewTrigger] = useState(0);
+  const [theme, setTheme] = useState<'all' | 'car' | 'bike' | 'none'>('all');
+  const [brand, setBrand] = useState<string>('All');
+  const carBrands = ['BMW','Mercedes','Audi','Porsche','Lamborghini','Ferrari','Toyota','Honda','Ford'];
+  const bikeBrands = ['Yamaha','Kawasaki','Ducati','Honda','Royal Enfield','KTM','Suzuki'];
+  const [category, setCategory] = useState<'all' | 'tshirt' | 'hoodie'>('all');
+  const [color, setColor] = useState<'all' | 'black' | 'white' | 'red' | 'blue' | 'green' | 'yellow' | 'purple' | 'pink' | 'gray' | 'navy'>('all');
 
   useEffect(() => {
     let mounted = true;
@@ -69,10 +79,31 @@ export default function CollectionsContent() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
   };
 
-  // Removed button variants since Show More is no longer used
-
-  // Show all products on the home screen
-  const visibleProducts = products;
+  // Client-side filtering based on product fields
+  const visibleProducts = products.filter((p) => {
+    // Theme filter
+    if (theme !== 'all') {
+      if (theme === 'none') {
+        if ((p.theme ?? 'none') !== 'none') return false;
+      } else {
+        if (p.theme !== theme) return false;
+      }
+    }
+    // Brand filter (only when theme is car/bike)
+    if ((theme === 'car' || theme === 'bike') && brand !== 'All') {
+      if ((p.brand || '') !== brand) return false;
+    }
+    // Category filter
+    if (category !== 'all') {
+      if (p.category !== category) return false;
+    }
+    // Color filter
+    if (color !== 'all') {
+      const colors = Array.isArray(p.colors) ? p.colors.map((c)=>c.toLowerCase()) : [];
+      if (!colors.includes(color)) return false;
+    }
+    return true;
+  });
 
   return (
     <section
@@ -96,6 +127,19 @@ export default function CollectionsContent() {
         </p>
         <div className="mx-auto w-24 h-[2px] bg-gradient-to-r from-amber-500 to-yellow-300 rounded-full"></div>
       </motion.div>
+
+      {/* Filters */}
+      <FiltersBar
+        theme={theme}
+        onChangeTheme={(v)=>{ setTheme(v); setBrand('All'); }}
+        brand={brand}
+        onChangeBrand={setBrand}
+        brandOptions={theme === 'car' ? carBrands : theme === 'bike' ? bikeBrands : []}
+        category={category}
+        onChangeCategory={setCategory}
+        color={color}
+        onChangeColor={setColor}
+      />
 
       {/* Loading */}
       {loading ? (

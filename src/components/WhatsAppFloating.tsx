@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 export default function WhatsAppFloating() {
   const [isVisible, setIsVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 500);
@@ -15,17 +16,31 @@ export default function WhatsAppFloating() {
     return () => setMounted(false);
   }, []);
 
+  useEffect(() => {
+    function onOpen() { setDisabled(true); }
+    function onClose() { setDisabled(false); }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('chatbot:open', onOpen as EventListener);
+      window.addEventListener('chatbot:close', onClose as EventListener);
+      return () => {
+        window.removeEventListener('chatbot:open', onOpen as EventListener);
+        window.removeEventListener('chatbot:close', onClose as EventListener);
+      };
+    }
+  }, []);
+
   if (!mounted) return null;
 
   return createPortal(
     <>
       <div
         className={`fixed z-[9999] transition-all duration-500 ${
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          isVisible && !disabled ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         }`}
         style={{
           right: "calc(env(safe-area-inset-right, 0px) + 1rem)",
           bottom: "calc(env(safe-area-inset-bottom, 0px) + 1rem)",
+          pointerEvents: disabled ? 'none' : 'auto',
         }}
       >
         <div className="absolute inset-0 flex items-center justify-center">

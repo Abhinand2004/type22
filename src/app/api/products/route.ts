@@ -19,6 +19,9 @@ type Incoming = {
   material?: unknown;
   discount?: unknown;
   sizeChart?: unknown;
+  theme?: unknown;
+  brand?: unknown;
+  originalPrice?: unknown;
 };
 
 function asStringArray(v: unknown): string[] | undefined {
@@ -38,17 +41,23 @@ function normalizeProduct(data: Incoming) {
   const material = typeof data.material === 'string' ? data.material : undefined;
   const discount = typeof data.discount === 'number' ? data.discount : (data.discount != null ? Number(data.discount) : undefined);
   const sizeChart = typeof data.sizeChart === 'string' ? data.sizeChart : undefined;
+  const theme = typeof data.theme === 'string' ? data.theme : undefined;
+  const brand = typeof data.brand === 'string' ? data.brand : undefined;
+  const originalPrice = typeof data.originalPrice === 'number' ? data.originalPrice : (data.originalPrice != null ? Number(data.originalPrice) : undefined);
 
   const allowedCategories = new Set(['tshirt','hoodie']);
+  const allowedThemes = new Set(['car','bike','none']);
   if (!title) return { ok: false as const, error: 'title is required' };
   if (!Number.isFinite(priceNum)) return { ok: false as const, error: 'price must be a number' };
   if (!allowedCategories.has(category)) return { ok: false as const, error: 'category must be one of tshirt, hoodie' };
+  if (theme && !allowedThemes.has(theme)) return { ok: false as const, error: 'theme must be one of car, bike, none' };
 
   return {
     ok: true as const,
     value: {
       title,
       price: priceNum,
+      discountPrice: priceNum,
       description,
       images,
       category: category as 'tshirt' | 'hoodie',
@@ -57,6 +66,9 @@ function normalizeProduct(data: Incoming) {
       material,
       discount,
       sizeChart,
+      originalPrice: Number.isFinite(originalPrice as number) ? (originalPrice as number) : undefined,
+      theme: theme as 'car' | 'bike' | 'none' | undefined,
+      brand,
     },
   };
 }
@@ -75,6 +87,10 @@ export async function POST(req: Request) {
     material?: string;
     discount?: number;
     sizeChart?: string;
+    originalPrice?: number;
+    discountPrice?: number;
+    theme?: 'car' | 'bike' | 'none';
+    brand?: string;
   };
   if (Array.isArray(data)) {
     const normalized: Normalized[] = [];

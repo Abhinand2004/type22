@@ -18,6 +18,7 @@ export default async function AdminHome() {
           <Link href="/admin/products" className="rounded-lg border p-6 hover:bg-zinc-50 dark:hover:bg-zinc-900">Manage Products</Link>
           <Link href="/admin/requests" className="rounded-lg border p-6 hover:bg-zinc-50 dark:hover:bg-zinc-900">Design Requests</Link>
           <Link href="/admin/site" className="rounded-lg border p-6 hover:bg-zinc-50 dark:hover:bg-zinc-900">Site Content</Link>
+          <Link href="/admin/reviews" className="rounded-lg border p-6 hover:bg-zinc-50 dark:hover:bg-zinc-900">Reviews</Link>
         </div>
       </main>
       <Footer />

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -17,6 +16,9 @@ type P = {
   discount?: number;
   sizeChart?: string;
   createdAt?: string;
+  theme?: 'car' | 'bike' | 'none';
+  brand?: string;
+  originalPrice?: number;
 };
 
 export default function AdminProductsPage() {
@@ -96,9 +98,27 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<'tshirt'|'hoodie'>('tshirt');
   const [sizesText, setSizesText] = useState('S,M,L');
-  const [colorsText, setColorsText] = useState('black,white');
+  const [selectedColor, setSelectedColor] = useState<string>('black');
   const [files, setFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
+  const [theme, setTheme] = useState<'car'|'bike'|'none'>('none');
+  const [brand, setBrand] = useState<string>('');
+  const [originalPrice, setOriginalPrice] = useState<number | ''>('');
+  const [discountPercent, setDiscountPercent] = useState<number>(0);
+
+  useEffect(() => {
+    // Auto set base price on category change
+    if (category === 'tshirt') setPrice(499);
+    else if (category === 'hoodie') setPrice(899);
+  }, [category]);
+
+  useEffect(() => {
+    // Auto compute price from originalPrice and discount
+    if (typeof originalPrice === 'number' && Number.isFinite(originalPrice)) {
+      const computed = Math.max(0, Math.round(originalPrice * (1 - (discountPercent || 0) / 100)));
+      if (Number.isFinite(computed)) setPrice(computed);
+    }
+  }, [originalPrice, discountPercent]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -140,13 +160,18 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
         images,
         category,
         sizes: sizesText.split(',').map(s=>s.trim()).filter(Boolean),
-        colors: colorsText.split(',').map(c=>c.trim()).filter(Boolean),
+        colors: selectedColor ? [selectedColor] : [],
+        theme: theme,
+        brand: brand || undefined,
+        originalPrice: typeof originalPrice === 'number' ? originalPrice : undefined,
+        discount: discountPercent || undefined,
       };
       const res = await fetch('/api/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error('create failed');
       const created = await res.json();
       onCreated?.(created);
       setTitle(''); setPrice(499); setDescription(''); setFiles([]);
+      setTheme('none'); setBrand(''); setSelectedColor('black'); setOriginalPrice(''); setDiscountPercent(0);
     } catch (err) {
       console.error(err);
       alert('Failed to create');
@@ -164,26 +189,48 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
       <input multiple type="file" onChange={(e) => setFiles(Array.from(e.target.files ?? []))} />
       <input className="p-2 rounded border" placeholder="Sizes (comma separated)" value={sizesText} onChange={(e) => setSizesText(e.target.value)} />
       <div className="flex flex-col gap-2">
-        <input className="p-2 rounded border" placeholder="Colors (comma separated)" value={colorsText} onChange={(e) => setColorsText(e.target.value)} />
+        <label className="text-sm">Color</label>
         <div className="flex flex-wrap gap-2 text-xs">
           {['black','white','red','blue','green','yellow','purple','pink','gray','navy'].map((c) => {
-            const selected = colorsText.split(',').map(s=>s.trim()).filter(Boolean);
-            const isSel = selected.includes(c);
+            const isSel = selectedColor === c;
             return (
               <button
                 type="button"
                 key={c}
-                onClick={() => {
-                  let next = selected;
-                  if (isSel) next = selected.filter(s=>s!==c);
-                  else next = [...selected, c];
-                  setColorsText(next.join(','));
-                }}
+                onClick={() => setSelectedColor(c)}
                 className={`px-2 py-1 rounded border ${isSel ? 'bg-blue-600 text-white' : 'bg-white/5'}`}
               >{c}</button>
             );
           })}
         </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm">Type</label>
+        <select className="p-2 rounded border" value={theme} onChange={(e)=>{ setTheme(e.target.value as 'car'|'bike'|'none'); setBrand(''); }}>
+          <option value="none">None</option>
+          <option value="car">Car T-Shirt/Hoodie</option>
+          <option value="bike">Bike T-Shirt/Hoodie</option>
+        </select>
+      </div>
+      {theme !== 'none' && (
+        <div className="flex flex-col gap-2">
+          <label className="text-sm">Brand</label>
+          <select className="p-2 rounded border" value={brand} onChange={(e)=>setBrand(e.target.value)}>
+            <option value="">Select brand</option>
+            {(theme === 'car'
+              ? ['BMW','Mercedes','Audi','Porsche','Lamborghini','Ferrari','Toyota','Honda','Ford']
+              : ['Yamaha','Kawasaki','Ducati','Honda','Royal Enfield','KTM','Suzuki']
+            ).map(b => (<option key={b} value={b}>{b}</option>))}
+          </select>
+        </div>
+      )}
+      <div className="flex flex-col gap-2">
+        <label className="text-sm">Original Price</label>
+        <input type="number" className="p-2 rounded border" placeholder="e.g. 999" value={originalPrice as number | ''} onChange={(e)=> setOriginalPrice(e.target.value === '' ? '' : Number(e.target.value))} />
+      </div>
+      <div className="flex flex-col gap-2">
+        <label className="text-sm">Discount %</label>
+        <input type="number" className="p-2 rounded border" placeholder="e.g. 20" value={discountPercent} onChange={(e)=> setDiscountPercent(Number(e.target.value))} />
       </div>
       <textarea className="p-2 rounded border md:col-span-4" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
       <div className="md:col-span-4">
@@ -192,10 +239,4 @@ function AddNewProduct({ onCreated }: { onCreated?: (p: P) => void }) {
     </form>
   );
 }
-
-
-
-
-
-
 

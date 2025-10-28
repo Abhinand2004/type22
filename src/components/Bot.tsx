@@ -58,9 +58,15 @@ const Bot = () => {
     }
   }, [modalOpen, loaded]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent(modalOpen ? 'chatbot:open' : 'chatbot:close'));
+    }
+  }, [modalOpen]);
+
   return (
     <>
-      {createPortal(
+      {!modalOpen && createPortal(
         <motion.div
           className="fixed z-[9999] cursor-pointer"
           style={{

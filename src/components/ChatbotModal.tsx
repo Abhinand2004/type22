@@ -97,6 +97,7 @@ Remember: You're here to help customers learn about Type22 products and guide th
   const [isTyping, setIsTyping] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
 
   useEffect(() => {
     chatRef.current?.scrollTo({
@@ -123,6 +124,7 @@ Remember: You're here to help customers learn about Type22 products and guide th
     setIsTyping(true);
 
     try {
+
       // Try to detect a mentioned product by title
       const findMatchedProduct = (q: string) => {
         const ql = q.toLowerCase();
@@ -157,8 +159,9 @@ Remember: You're here to help customers learn about Type22 products and guide th
 
       const prompt = `${systemPrompt}\n\nConversation:\n${conversationHistory}\n\nRespond as Dudu (keep it short and friendly):`;
 
+      const model = process.env.NEXT_PUBLIC_GEMINI_MODEL || 'gemini-2.5-flash';
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -314,7 +317,7 @@ Remember: You're here to help customers learn about Type22 products and guide th
                     >
                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                     </motion.div>
-                  ) : msg.product ? (
+                  ) : msg.type === "product" && msg.product ? (
                     <div className="max-w-[80%]">
                       <div className="overflow-hidden rounded-2xl border border-blue-500/30 bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-lg">
                         {(() => {

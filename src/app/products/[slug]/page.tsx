@@ -10,6 +10,7 @@ import OffersSection from '@/components/OffersSection';
 import ProductMoreDetails from '@/components/ProductMoreDetails';
 import ProductImageCarousel from '@/components/ProductImageCarousel';
 import type { Metadata } from 'next';
+import ProductRatingBar from '@/components/ProductRatingBar';
 
 type Ctx = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Ctx): Promise<Metadata> {
@@ -122,6 +123,9 @@ export default async function ProductDetail({ params }: Ctx) {
               </h1>
               
               <div className="flex items-baseline gap-4 flex-wrap">
+                {product.originalPrice && product.originalPrice > (product.price || 0) && (
+                  <span className="text-lg line-through text-zinc-400">₹{product.originalPrice}</span>
+                )}
                 <span className="text-4xl lg:text-5xl font-bold text-blue-400 animate-pulse">₹{product.price}</span>
                 {product.discount && (
                   <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-semibold border border-blue-500/30 animate-bounce">
@@ -148,6 +152,30 @@ export default async function ProductDetail({ params }: Ctx) {
                   <div className="px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-500/10 to-transparent border border-blue-500/20 inline-block hover:border-blue-400/40 hover:scale-105 transition-all duration-300">
                     <span className="text-white font-medium">{product.material}</span>
                   </div>
+                </div>
+              </AnimateInView>
+            )}
+
+            {/* Type & Brand */}
+            {(product.theme || product.brand) && (
+              <AnimateInView>
+                <div className="grid grid-cols-2 gap-4">
+                  {product.theme && (
+                    <div className="space-y-2">
+                      <h3 className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Type</h3>
+                      <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 inline-block">
+                        <span className="text-white font-medium">{product.theme}</span>
+                      </div>
+                    </div>
+                  )}
+                  {product.brand && (
+                    <div className="space-y-2">
+                      <h3 className="text-xs uppercase tracking-widest text-gray-500 font-semibold">Brand</h3>
+                      <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 inline-block">
+                        <span className="text-white font-medium">{product.brand}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </AnimateInView>
             )}
@@ -217,6 +245,9 @@ export default async function ProductDetail({ params }: Ctx) {
               description={product.description}
             />
           </div>
+
+          {/* Ratings */}
+          <ProductRatingBar productId={String(product._id)} />
 
           {/* Related Products */}
           {relatedProducts?.length > 0 && (
